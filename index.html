@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>check your IQ level :)</title>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;700&display=swap'); /* Fun and friendly font */
+        
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: linear-gradient(135deg, #FF6B6B, #F7C43C); /* Bright Red-Orange to Yellow Gradient */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #333;
+        }
+
+        #app-container {
+            background-color: #FFFFFF;
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            width: 90%;
+            max-width: 650px;
+            text-align: center;
+            border: 8px solid #4ECDC4; /* Teal Border */
+            transition: all 0.5s ease;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        h1, h2 {
+            color: #A239CA; /* Vibrant Purple */
+            text-shadow: 2px 2px 0 #FFD93D; /* Yellow shadow for a fun look */
+            margin-bottom: 25px;
+        }
+        
+        /* Instructions List Styling */
+        ul {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+            margin: 20px auto;
+            max-width: 450px;
+        }
+
+        li {
+            background-color: #F7C43C; /* Sunny Yellow list item */
+            color: #333;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 5px 0 #E76F51;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        li:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Buttons Styling (Common) */
+        button {
+            background-color: #FF6B6B; /* Bright Red button */
+            color: #fff;
+            border: none;
+            padding: 15px 35px;
+            margin: 10px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: 700;
+            box-shadow: 0 6px 0 #E76F51;
+            transition: background-color 0.3s, transform 0.1s, box-shadow 0.1s;
+        }
+
+        button:active {
+            box-shadow: 0 2px 0 #E76F51;
+            transform: translateY(4px);
+        }
+
+        /* Option Buttons Specific Styling */
+        #options-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        #options-container button {
+            background-color: #4ECDC4; /* Teal for options */
+            width: 100%;
+            padding: 18px 10px;
+            font-size: 1.1em;
+            border-radius: 12px;
+            box-shadow: 0 4px 0 #39A59E;
+        }
+        #options-container button:hover {
+            background-color: #39A59E;
+        }
+        #options-container button:active {
+            box-shadow: 0 1px 0 #39A59E;
+            transform: translateY(3px);
+        }
+
+        /* Timer and Level Display */
+        #timer-display {
+            font-size: 2em;
+            color: #2F9C4A; /* Healthy Green timer */
+            margin-top: 30px;
+            font-weight: 700;
+            text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
+        }
+        
+        #level-display {
+            font-size: 1.5em;
+            color: #FF6B6B;
+        }
+
+        #question-text {
+            font-size: 1.6em;
+            margin: 25px 0;
+            min-height: 50px;
+            color: #333;
+        }
+        
+        /* Result Screen Styling */
+        #iq-range {
+            color: #A239CA;
+            font-size: 2.5em;
+            margin: 20px 0;
+            font-weight: 700;
+        }
+        
+        #correct-answers {
+            color: #FF6B6B;
+            font-size: 1.5em;
+        }
+    </style>
+    </head>
+<body>
+
+    <div id="app-container">
+        
+        <div id="start-screen" class="screen active">
+            <h1>🌟 ultimate IQ Challenge! 🧠</h1>
+            <p style="font-size: 1.1em;"><strong>Ready to test your brainpower? Read the rules and let's go!</strong></p>
+            <ul>
+                <li>There are exactly **22 exciting levels**.</li>
+                <li>Each level is designed to be **tougher than the last**.</li>
+                <li>You have **15 seconds** for each question.</li>
+                <li>Your **IQ Level Range** will be calculated based on your final score.</li>
+            </ul>
+            <button id="start-button">Start The Challenge!</button>
+        </div>
+
+        <div id="test-screen" class="screen">
+            <h2 id="level-display">Level 1/22</h2>
+            <div id="question-area">
+                <p id="question-text">Question text will appear here.</p>
+                <div id="options-container">
+                    </div>
+            </div>
+            <p id="timer-display">Time Left: 20s</p>
+        </div>
+
+        <div id="result-screen" class="screen">
+            <h1>🎉 Challenge Complete! 🎉</h1>
+            <p style="font-size: 1.2em;">You got **<span id="correct-answers">0</span>** out of 22 questions correct!</p>
+            <h2 id="iq-range">Your Calculated IQ Range: Calculating...</h2>
+            <button id="restart-button">Try Again (Boost Your Score!)</button>
+        </div>
+
+    </div>
+
+    <script>
+        // Data for 22 Levels (Progressive Difficulty)
+        const quizData = [
+            // Level 1: Very Easy - Simple Math
+            {question: "1.  If you drink me, you live; if I drink you, you die ,gusse who i am?", options: ["alcohol", "cold drink", "poison", "water"], answer: "water" }, 
+            // Level 2: Easy - Basic Word Analogy
+            { question: "2. 'SHOE' is to 'FOOT' as 'GLOVE' is to...?", options: ["Hand", "Arm", "Finger", "Wrist"], answer: "Hand" },
+            // Level 3: Simple Number Pattern
+            { question: "3. Complete the sequence: 5, 10, 15, 20, ?", options: ["22", "25", "30", "28"], answer: "25" },
+            // Level 4: Simple Logic Riddle
+            { question: "4. What has to be broken before you can use it?", options: ["A secret", "An egg", "A rule", "A promise"], answer: "An egg" },
+            // Level 5: Time Calculation
+            { question: "5. If it takes 3 minutes to boil one egg, how long does it take to boil four eggs?", options: ["12 minutes", "3 minutes", "6 minutes", "4 minutes"], answer: "12 minutes" },
+            // Level 6: Alphabet Pattern (A, B, C...)
+            { question: "6. Complete the sequence: A, C, E, G, ?", options: ["H", "I", "J", "K"], answer: "I" },
+            // Level 7: Find the Odd One Out
+            { question: "7. Which is the odd one out: Car, Train, Bus, Bicycle?", options: ["Car", "Train", "Bus", "Bicycle"], answer: "Bicycle" },
+            // Level 8: Calendar Logic
+            { question: "8. The day after tomorrow is Wednesday. What day was yesterday?", options: ["Monday", "Sunday", "Tuesday", "Saturday"], answer: "Sunday" },
+            // Level 9: Basic Algebra with Variables
+            { question: "9. If 2x + 4 = 16, what is x?", options: ["6", "8", "10", "12"], answer: "6" },
+            // Level 10: Riddle (Who am I?)
+            { question: "10. If you walk, I walk; if you stop, I stop; but if you rest in darkness, I’m gone. Who am I ?", options: ["angle", "posivity", "shadow", "parents"], answer: "shadow" },
+            // Level 11:  Riddle (What am I?)
+            { question: "11. I have keys but I can’t open locks?", options: ["keyboad", "keychain", "piano", "human"], answer: "keyboard" },
+            // Level 12: Conditional Logic
+            { question: "12. All birds can fly. An ostrich is a bird. Does an ostrich fly?", options: ["Yes", "No", "Sometimes", "Maybe"], answer: "No" },
+            // Level 13: Advanced Alphabet Pattern (Jumping)
+            { question: "13. Complete the sequence: Z, X, V, T, ?", options: ["R", "S", "U", "P"], answer: "R" },
+            // Level 14: Complex Number Sequence (Two alternating rules)
+            { question: "14. Complete the sequence: 6, 18, 30, 42, ?", options: ["48", "54", "60", "20"], answer: "54" },
+            // Level 15: Coding/Decoding (Simple Shift)
+            { question: "15. If 'CAT' is coded as 'DBU', how is 'DOG' coded?", options: ["EPH", "CPF", "EPC", "FPH"], answer: "EPH" },
+            // Level 16: Lateral Thinking Riddle (Harder)
+            { question: "16. I am light as a feather, but even the strongest person can't hold me for 5 minutes. What am I?", options: ["A cloud", "A breath", "Air", "Water"], answer: "A breath" },
+            // Level 17: Geometry/Logic
+            { question: "17. A cube has 6 faces. How many vertices (corners) does it have?", options: ["6", "8", "12", "4"], answer: "8" },
+            // Level 18: Advanced Math Riddle (Work/Rate)
+            { question: "18. A gardener can dig a hole in 1 hour. How long would it take two gardeners to dig half a hole?", options: ["30 minutes", "15 minutes", "1 hour", "You can't dig half a hole"], answer: "You can't dig half a hole" },
+            // Level 19: Analogy (Complex Relationship)
+            { question: "19. 'POET' is to 'VERSES' as 'BAKER' is to...?", options: ["Flour", "Bread", "Oven", "Dough"], answer: "Bread" },
+            // Level 20: Number Matrix (Find the rule across rows/columns)
+            { question: "20. If 4x2=8, 6x3=18, 5x4=20, then 7x5=?", options: ["30", "35", "40", "45"], answer: "35" },
+            // Level 21: High-Level Family Logic
+            { question: "21. A woman's father is the son of my father. I have no brothers or sisters. Who is the woman?", options: ["My mother", "My daughter", "My niece", "My sister"], answer: "My daughter" },
+            // Level 22:  Missing Letter Sequence
+            { question: "22. What is the missing letter in the sequence: c, i, a, d, g, f ?", options: ["D", "J", "E", "F"], answer: "E" } 
+        ];
+
+        // --- Core Variables ---
+        let currentLevel = 0;
+        let score = 0;
+        let timer;
+        const TIME_PER_LEVEL = 15; // 15s seconds per question
+
+        // --- DOM Elements ---
+        const startScreen = document.getElementById('start-screen');
+        const testScreen = document.getElementById('test-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const startButton = document.getElementById('start-button');
+        const restartButton = document.getElementById('restart-button');
+        const levelDisplay = document.getElementById('level-display');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const timerDisplay = document.getElementById('timer-display');
+        const correctAnswersSpan = document.getElementById('correct-answers');
+        const iqRangeH2 = document.getElementById('iq-range');
+
+        // --- Functions ---
+
+        function showScreen(screenToShow) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            screenToShow.classList.add('active');
+        }
+
+        function startTest() {
+            currentLevel = 0;
+            score = 0;
+            showScreen(testScreen);
+            loadLevel();
+        }
+
+        function loadLevel() {
+            if (currentLevel >= quizData.length) {
+                showResults();
+                return;
+            }
+
+            const currentQuiz = quizData[currentLevel];
+            
+            levelDisplay.textContent = `Level ${currentLevel + 1}/${quizData.length}`;
+            questionText.textContent = currentQuiz.question;
+            optionsContainer.innerHTML = '';
+
+            // Create Option Buttons
+            currentQuiz.options.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.onclick = () => selectAnswer(option, currentQuiz.answer, button);
+                optionsContainer.appendChild(button);
+            });
+
+            // Reset and Start Timer
+            clearInterval(timer);
+            let timeLeft = TIME_PER_LEVEL;
+            timerDisplay.textContent = `Time Left: ${timeLeft}s`;
+            timerDisplay.style.color = '#2F9C4A'; // Reset color
+
+            timer = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = `Time Left: ${timeLeft}s`;
+
+                if (timeLeft <= 5) {
+                     timerDisplay.style.color = '#FF6B6B'; // Red for urgency
+                }
+
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    // Treat as wrong answer if time runs out
+                    currentLevel++;
+                    loadLevel();
+                }
+            }, 1000);
+        }
+
+        function selectAnswer(selected, correct, button) {
+            clearInterval(timer);
+            document.querySelectorAll('#options-container button').forEach(btn => btn.disabled = true);
+            
+            // Visual Feedback
+            if (selected === correct) {
+                score++;
+                button.style.backgroundColor = '#2F9C4A'; // Green
+                button.style.boxShadow = '0 4px 0 #1D6B33';
+            } else {
+                button.style.backgroundColor = '#FF6B6B'; // Red
+                button.style.boxShadow = '0 4px 0 #E76F51';
+            }
+            
+            // Move to next question
+            setTimeout(() => {
+                currentLevel++;
+                loadLevel();
+            }, 500);
+        }
+
+        function calculateIQ(correctCount) {
+    // Simplified IQ Range Logic (Based on 22 questions)
+    if (correctCount === 22)
+        return "👑 Global Genius (160+)\nA global genius doesn’t just think big — they think beyond limits, shaping ideas that change the world.🌍💫";
+    if (correctCount >= 20)
+        return "🌟 Master Mind (140-159)\nA mastermind doesn’t follow the path — they create it, and others follow their vision. 🧠🚀";
+    if (correctCount >= 17)
+        return "✨ Superior (120-139)\nWhen you’re already at the top, the real challenge begins — staying humble, hungry, and ahead. 🔥👑";
+    if (correctCount >= 13)
+        return "👍 Sharp Mind (100-119)\nA sharp mind isn’t born — it’s built by focus, consistency, and the hunger to learn more every day.⚡🧠";
+    if (correctCount >= 8)
+        return "🤔 Average Being average isn’t a problem — the one who wins is the person who tries to be a little better every single day.💪✨";
+    return "💡 Warming Up... (< 80)\nKeep learning, keep growing — the journey to greatness just began!";
+}
+
+        
+
+        function showResults() {
+            showScreen(resultScreen);
+            correctAnswersSpan.textContent = score;
+            iqRangeH2.textContent = `Your Calculated IQ Range: ${calculateIQ(score)}`;
+        }
+
+        // --- Event Listeners ---
+        startButton.addEventListener('click', startTest);
+        restartButton.addEventListener('click', startTest);
+
+        // Initial call to show the start screen
+        showScreen(startScreen);
+    </script>
+    </body>
+</html>
